@@ -53,7 +53,25 @@ try:
     else:
         for i, indx in enumerate(states):
             data = df[df.state == states[i]]
-            st.write(f"### Prices of Goods in {states[i]} Markets", data.head())
+            temp = data.copy()
+            # helper 
+            @st.cache
+            def first_5(temp):
+                items = temp.produce.unique()
+                items = items[:10]
+                items_trimed = temp['produce'].drop_duplicates()
+                items_trimed_indx = [i for i in items_trimed.index]
+                first_5_produce = temp.loc[items_trimed_indx]
+                return first_5_produce
+
+            view_items = first_5(temp)
+            view_items = (view_items[['produce', 'market_type',
+            'quantity', 'year', 'price']])
+            view_items = (view_items.reset_index())
+            view_items = view_items.drop(columns='index')
+            
+            # display helper
+            st.write(f"### Prices of Goods in {states[i]} Markets", view_items)
             
             # using the data let's build a line chart 
             # we build a pivot table 
